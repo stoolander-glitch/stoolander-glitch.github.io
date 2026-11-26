@@ -6,22 +6,22 @@
 <title>Fear &amp; Greed — Candlestick Chart</title>
 <style>
   body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-         margin: 24px; color: #1c2733; background: #fff; }
+         margin: 24px; color: #d9e1ee; background: #171e36; }
   h1 { font-size: 20px; margin: 0 0 6px; }
-  .rule { font-size: 13.5px; line-height: 1.45; color: #43536a; max-width: 980px; margin: 0 0 4px; }
+  .rule { font-size: 13.5px; line-height: 1.45; color: #9aa9c2; max-width: 980px; margin: 0 0 4px; }
   .latest { font-size: 14px; font-weight: 600; margin: 8px 0 12px; }
   .ranges { margin: 0 0 8px; }
-  .ranges button { font-size: 13px; padding: 4px 12px; margin-right: 6px;
-                   border: 1px solid #b9c4d0; background: #f2f5f8; border-radius: 4px; cursor: pointer; }
-  .ranges button.active { background: #1f6fb2; color: #fff; border-color: #1f6fb2; }
-  svg { width: 100%; height: auto; display: block; }
-  .axis { font-size: 11px; fill: #5a6a7d; }
-  .bandlabel { font-size: 11px; fill: #74808e; }
-  .latesttag { font-size: 12.5px; font-weight: 700; fill: #1f6fb2;
-               paint-order: stroke; stroke: #fff; stroke-width: 3.5px; }
-  .rangelabel { font-size: 10.5px; font-weight: 600; fill: #5a6a7d;
-              paint-order: stroke; stroke: #fff; stroke-width: 3px; }
-  .legend { font-size: 12.5px; color: #43536a; margin-top: 6px; }
+  .ranges button { font-size: 13px; padding: 4px 12px; margin-right: 6px; color: #d9e1ee;
+                   border: 1px solid #3d4a73; background: #232c4c; border-radius: 4px; cursor: pointer; }
+  .ranges button.active { background: #2f80c9; color: #fff; border-color: #2f80c9; }
+  svg { width: 100%; height: auto; display: block; background: #171e36; }
+  .axis { font-size: 11px; fill: #93a3bd; }
+  .bandlabel { font-size: 11px; fill: #7f8ea9; }
+  .latesttag { font-size: 12.5px; font-weight: 700; fill: #57a8e6;
+               paint-order: stroke; stroke: #171e36; stroke-width: 3.5px; }
+  .rangelabel { font-size: 10.5px; font-weight: 600; fill: #b6c2d6;
+              paint-order: stroke; stroke: #171e36; stroke-width: 3px; }
+  .legend { font-size: 12.5px; color: #9aa9c2; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -50,7 +50,7 @@ candles. History from 2025-10-30.</p>
   <button data-days="100000" class="active">All</button>
 </div>
 <svg id="chart" viewBox="0 0 960 470" role="img" aria-label="Fear and Greed candlestick chart"></svg>
-<p class="legend">Green candle: close at or above the open. Red: below it.
+<p class="legend">Teal candle: close above the open. Red: below it. Grey: unchanged.
 Hover any candle for its values. In the 1M view, a tracked day&rsquo;s high is
 labelled above its wick and its low below it; the close is unlabelled &mdash;
 where the body ends against the wick is the information.
@@ -65,11 +65,11 @@ var DATA = [{"d": "2025-10-30", "c": 37, "o": null, "mn": null, "mx": null, "src
 var WEEK30 = [{"label": "Nov 19 3:30pm", "day": "2026-11-19", "t": "15:30", "o": 24, "h": 31, "l": 19, "c": 19, "syn": true}, {"label": "Nov 20 3:30pm", "day": "2026-11-20", "t": "15:30", "o": 17, "h": 17, "l": 10, "c": 10, "syn": true}, {"label": "Nov 23 3:30pm", "day": "2026-11-23", "t": "15:30", "o": 16, "h": 21, "l": 16, "c": 18, "syn": true}, {"label": "Nov 24 3:30pm", "day": "2026-11-24", "t": "15:30", "o": 18, "h": 18, "l": 14, "c": 17, "syn": true}, {"label": "Nov 25 3:30pm", "day": "2026-11-25", "t": "15:30", "o": 11, "h": 16, "l": 9, "c": 15, "syn": true}];
 var DAY5 = [];
 var BANDS = [
-  {lo: 75.5, hi: 100,  color: "rgba(27,140,70,0.15)",  label: "Extreme Greed"},
-  {lo: 54.5, hi: 75.5, color: "rgba(39,174,96,0.09)",  label: "Greed"},
-  {lo: 45.5, hi: 54.5, color: "rgba(110,110,110,0.08)", label: "Neutral"},
-  {lo: 25.5, hi: 45.5, color: "rgba(230,126,34,0.10)", label: "Fear"},
-  {lo: 0,    hi: 25.5, color: "rgba(214,48,49,0.12)",  label: "Extreme Fear"}
+  {lo: 75.5, hi: 100,  color: "rgba(46,170,95,0.20)",  label: "Extreme Greed"},
+  {lo: 54.5, hi: 75.5, color: "rgba(46,170,95,0.10)",  label: "Greed"},
+  {lo: 45.5, hi: 54.5, color: "rgba(160,170,195,0.07)", label: "Neutral"},
+  {lo: 25.5, hi: 45.5, color: "rgba(232,150,60,0.12)", label: "Fear"},
+  {lo: 0,    hi: 25.5, color: "rgba(216,84,78,0.17)",  label: "Extreme Fear"}
 ];
 var W = 960, H = 470, ML = 118, MR = 52, MT = 12, MB = 30;
 var PW = W - ML - MR, PH = H - MT - MB;
@@ -139,7 +139,7 @@ function draw(maxDays) {
   // y gridlines + labels
   [0, 25, 50, 75, 100].forEach(function(v) {
     svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
-      stroke: v === 0 || v === 100 ? "#9fb0c1" : "#dde4ec", "stroke-width": 1}));
+      stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
     var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
     t.textContent = v;
     svg.appendChild(t);
@@ -181,7 +181,8 @@ function draw(maxDays) {
   candles.forEach(function(k, i) {
     var cx = X(i);
     var up = k.c >= k.o;
-    var col = up ? "#1e8449" : "#d63031";
+    var flat = k.c === k.o;
+    var col = flat ? "#b4bfd2" : (up ? "#32A499" : "#AD5650");
     var yH = Y(k.h), yL = Y(k.l), yO = Y(k.o), yC = Y(k.c);
     var title = (k.title ? k.title : k.label) +
       "\nOpen: " + k.o + " · High: " + k.h + " · Low: " + k.l + " · Close: " + k.c +
@@ -189,7 +190,7 @@ function draw(maxDays) {
       (daily ? "" : "\n(weekly candle from daily closes)");
     svg.appendChild(el("line", {x1: cx, x2: cx, y1: yH, y2: yL, stroke: col, "stroke-width": 1.5}));
     var body = el("rect", {x: cx - bw / 2, y: Math.min(yO, yC), width: bw,
-      height: Math.max(1.6, Math.abs(yC - yO)), fill: k.c === k.o ? "#fff" : col,
+      height: Math.max(1.6, Math.abs(yC - yO)), fill: flat ? "#8e9bb1" : col,
       stroke: col, "stroke-width": 1.5});
     var tt = document.createElementNS(NS, "title");
     tt.textContent = title;
@@ -207,7 +208,7 @@ function draw(maxDays) {
   // latest close marker + its value labelled on the right axis
   var lastC = candles[n - 1].c;
   svg.appendChild(el("line", {x1: X(n - 1), x2: ML + PW, y1: Y(lastC), y2: Y(lastC),
-    stroke: "#1f6fb2", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.55}));
+    stroke: "#57a8e6", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.7}));
   var lt = el("text", {x: ML + PW + 6, y: Y(lastC) + 4, "class": "latesttag"});
   lt.textContent = lastC;
   svg.appendChild(lt);
@@ -226,7 +227,7 @@ function drawWeek() {
   });
   [0, 25, 50, 75, 100].forEach(function(v) {
     svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
-      stroke: v === 0 || v === 100 ? "#9fb0c1" : "#dde4ec", "stroke-width": 1}));
+      stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
     var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
     t.textContent = v;
     svg.appendChild(t);
@@ -266,7 +267,7 @@ function drawWeek() {
   groups.forEach(function(g, gi) {
     if (gi > 0) {
       svg.appendChild(el("line", {x1: ML + band * gi, x2: ML + band * gi,
-        y1: MT, y2: MT + PH, stroke: "#c3cedb", "stroke-width": 1}));
+        y1: MT, y2: MT + PH, stroke: "rgba(163,178,205,0.28)", "stroke-width": 1}));
     }
     for (var i = g.first; i <= g.last; i++) {
       if (candles[i].t === "12:00") {
@@ -285,7 +286,8 @@ function drawWeek() {
   candles.forEach(function(k, i) {
     var cx = X(i);
     var up = k.c >= k.o;
-    var col = up ? "#1e8449" : "#d63031";
+    var flat = k.c === k.o;
+    var col = flat ? "#b4bfd2" : (up ? "#32A499" : "#AD5650");
     var yH = Y(k.h), yL = Y(k.l), yO = Y(k.o), yC = Y(k.c);
     var title = k.syn
       ? k.label.replace(/ [0-9]+:[0-9]+[ap]m$/, "") + " - daily close " + k.c +
@@ -295,7 +297,7 @@ function drawWeek() {
         "\n(30-minute candle from intraday samples)";
     svg.appendChild(el("line", {x1: cx, x2: cx, y1: yH, y2: yL, stroke: col, "stroke-width": 1.5}));
     var body = el("rect", {x: cx - bw / 2, y: Math.min(yO, yC), width: bw,
-      height: Math.max(1.6, Math.abs(yC - yO)), fill: k.c === k.o ? "#fff" : col,
+      height: Math.max(1.6, Math.abs(yC - yO)), fill: flat ? "#8e9bb1" : col,
       stroke: col, "stroke-width": 1.5});
     var tt = document.createElementNS(NS, "title");
     tt.textContent = title;
@@ -304,8 +306,8 @@ function drawWeek() {
   });
   // line through the closes
   var pts = candles.map(function(k, i) { return X(i) + "," + Y(k.c); }).join(" ");
-  svg.appendChild(el("polyline", {points: pts, fill: "none", stroke: "#1f6fb2",
-    "stroke-width": 1, opacity: 0.45}));
+  svg.appendChild(el("polyline", {points: pts, fill: "none", stroke: "#57a8e6",
+    "stroke-width": 1, opacity: 0.55}));
   // per-day high/low labels (per-bar labels would collide at ~65 bars)
   groups.forEach(function(g) {
     var hi = null, lo = null;
@@ -325,7 +327,7 @@ function drawWeek() {
   // latest close marker + its value labelled on the right axis
   var lastC = candles[n - 1].c;
   svg.appendChild(el("line", {x1: X(n - 1), x2: ML + PW, y1: Y(lastC), y2: Y(lastC),
-    stroke: "#1f6fb2", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.55}));
+    stroke: "#57a8e6", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.7}));
   var lt = el("text", {x: ML + PW + 6, y: Y(lastC) + 4, "class": "latesttag"});
   lt.textContent = lastC;
   svg.appendChild(lt);
@@ -344,7 +346,7 @@ function drawDay() {
   });
   [0, 25, 50, 75, 100].forEach(function(v) {
     svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
-      stroke: v === 0 || v === 100 ? "#9fb0c1" : "#dde4ec", "stroke-width": 1}));
+      stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
     var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
     t.textContent = v;
     svg.appendChild(t);
@@ -373,13 +375,13 @@ function drawDay() {
   svg.appendChild(dt);
   // the tick line through the day's samples at their actual times
   var pts = DAY5.map(function(p) { return X(p.m) + "," + Y(p.v); }).join(" ");
-  svg.appendChild(el("polyline", {points: pts, fill: "none", stroke: "#1f6fb2",
+  svg.appendChild(el("polyline", {points: pts, fill: "none", stroke: "#57a8e6",
     "stroke-width": 1.5}));
   var hi = 0, lo = 0;
   DAY5.forEach(function(p, i) {
     if (p.v > DAY5[hi].v) hi = i;
     if (p.v < DAY5[lo].v) lo = i;
-    var dot = el("circle", {cx: X(p.m), cy: Y(p.v), r: 2.2, fill: "#1f6fb2"});
+    var dot = el("circle", {cx: X(p.m), cy: Y(p.v), r: 2.2, fill: "#57a8e6"});
     var tt = document.createElementNS(NS, "title");
     tt.textContent = p.label + "\nFear & Greed: " + p.v;
     dot.appendChild(tt);
@@ -395,7 +397,7 @@ function drawDay() {
   // latest sample marker + its value labelled on the right axis
   var lastP = DAY5[DAY5.length - 1];
   svg.appendChild(el("line", {x1: X(lastP.m), x2: ML + PW, y1: Y(lastP.v), y2: Y(lastP.v),
-    stroke: "#1f6fb2", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.55}));
+    stroke: "#57a8e6", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.7}));
   var lt = el("text", {x: ML + PW + 6, y: Y(lastP.v) + 4, "class": "latesttag"});
   lt.textContent = lastP.v;
   svg.appendChild(lt);
