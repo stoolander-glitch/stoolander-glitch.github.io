@@ -186,10 +186,15 @@ function draw(maxDays) {
     svg.appendChild(lab);
   });
   // y gridlines + labels
-  [0, 25, 45, 55, 75, 100].forEach(function(v) {
-    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
+  // each interior line is drawn at its zone boundary - the band
+  // edge itself (the half-point between the two zones' integer
+  // scores) - and labelled with the CNN threshold value, so the
+  // line and the colour change it marks land on the same pixel
+  [[0, 0], [25, 25.5], [45, 45.5], [55, 54.5], [75, 75.5], [100, 100]].forEach(function(pair) {
+    var v = pair[0], yv = Y(pair[1]);
+    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: yv, y2: yv,
       stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
-    var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
+    var t = el("text", {x: ML + PW + 6, y: yv + 4, "class": "axis"});
     t.textContent = v;
     svg.appendChild(t);
   });
@@ -287,10 +292,15 @@ function drawWeek() {
     lab.textContent = b.label;
     svg.appendChild(lab);
   });
-  [0, 25, 45, 55, 75, 100].forEach(function(v) {
-    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
+  // each interior line is drawn at its zone boundary - the band
+  // edge itself (the half-point between the two zones' integer
+  // scores) - and labelled with the CNN threshold value, so the
+  // line and the colour change it marks land on the same pixel
+  [[0, 0], [25, 25.5], [45, 45.5], [55, 54.5], [75, 75.5], [100, 100]].forEach(function(pair) {
+    var v = pair[0], yv = Y(pair[1]);
+    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: yv, y2: yv,
       stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
-    var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
+    var t = el("text", {x: ML + PW + 6, y: yv + 4, "class": "axis"});
     t.textContent = v;
     svg.appendChild(t);
   });
@@ -416,10 +426,15 @@ function drawDay() {
     lab.textContent = b.label;
     svg.appendChild(lab);
   });
-  [0, 25, 45, 55, 75, 100].forEach(function(v) {
-    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
+  // each interior line is drawn at its zone boundary - the band
+  // edge itself (the half-point between the two zones' integer
+  // scores) - and labelled with the CNN threshold value, so the
+  // line and the colour change it marks land on the same pixel
+  [[0, 0], [25, 25.5], [45, 45.5], [55, 54.5], [75, 75.5], [100, 100]].forEach(function(pair) {
+    var v = pair[0], yv = Y(pair[1]);
+    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: yv, y2: yv,
       stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
-    var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
+    var t = el("text", {x: ML + PW + 6, y: yv + 4, "class": "axis"});
     t.textContent = v;
     svg.appendChild(t);
   });
