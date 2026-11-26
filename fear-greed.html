@@ -20,6 +20,7 @@
   .latesttag { font-size: 12.5px; font-weight: 700; fill: #57a8e6;
                paint-order: stroke; stroke: #171e36; stroke-width: 3.5px; }
   .rangelabel { font-size: 8px; fill: #7f8ea9; }
+  .spxlabel { font-size: 11px; fill: #e8b13c; }
   .legend { font-size: 12.5px; color: #9aa9c2; margin-top: 6px; }
 </style>
 </head>
@@ -41,12 +42,15 @@ samples recorded yet shows its daily candle &mdash; the same candle the
 1M view plots for that day &mdash; in the 3:30pm slot. The <b>1D</b> view
 plots the most recent session&rsquo;s <b>5-minute samples as a line</b> &mdash;
 a tick chart, one dot per sample across the 9:30&ndash;16:00 ET session, no
-candles. History from 2025-10-30.</p>
+candles. In the <b>1W and 1D</b> views an <b>amber line</b> overlays the
+<b>S&amp;P 500</b> on its own right-hand axis &mdash; 30-minute closes in
+the 1W, 5-minute closes in the 1D &mdash; toggled by the <b>SPX</b> button.
+History from 2025-10-30.</p>
 <p class="latest">Latest day (2026-11-25): open 11 &middot; high 16 &middot; low 9 &middot; close 15</p>
 <div class="ranges" id="ranges">
   <button data-view="day">1D</button><button data-view="week">1W</button><button data-days="31">1M</button><button data-days="92">3M</button>
   <button data-days="183">6M</button><button data-days="366">1Y</button>
-  <button data-days="100000" class="active">All</button>
+  <button data-days="100000" class="active">All</button><button data-spx="1" class="active" style="margin-left:14px">SPX</button>
 </div>
 <svg id="chart" viewBox="0 0 960 470" role="img" aria-label="Fear and Greed candlestick chart"></svg>
 <p class="legend">Teal candle: close above the open. Red: below it. Grey: unchanged.
@@ -57,12 +61,19 @@ In the 1W view, each day&rsquo;s high and low are labelled instead of each
 bar&rsquo;s. Days are spaced evenly &mdash; weekends and holidays take no space.
 In the 1D view, the line joins the session&rsquo;s 5-minute samples and the
 day&rsquo;s high and low samples are labelled; hover any dot for its time and
-value.</p>
+value. The amber line in the 1W and 1D views is the S&amp;P 500 (SPX) on its
+own right-hand axis; hover its dots for values, and use the SPX button to
+show or hide it.</p>
 <script>
 "use strict";
 var DATA = [{"d": "2025-10-30", "c": 37, "o": null, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-10-31", "c": 34, "o": 37, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-03", "c": 33, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-04", "c": 21, "o": 33, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-05", "c": 23, "o": 21, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-06", "c": 24, "o": 23, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-07", "c": 20, "o": 24, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-10", "c": 30, "o": 20, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-11", "c": 30, "o": 30, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-12", "c": 35, "o": 30, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-13", "c": 25, "o": 35, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-14", "c": 22, "o": 25, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-17", "c": 12, "o": 22, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-18", "c": 9, "o": 12, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-19", "c": 8, "o": 9, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-20", "c": 5, "o": 8, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-21", "c": 6, "o": 5, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-24", "c": 14, "o": 6, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-25", "c": 15, "o": 14, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-26", "c": 18, "o": 15, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-11-28", "c": 22, "o": 18, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-01", "c": 22, "o": 22, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-02", "c": 23, "o": 22, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-03", "c": 25, "o": 23, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-04", "c": 36, "o": 25, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-05", "c": 38, "o": 36, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-08", "c": 41, "o": 38, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-09", "c": 41, "o": 41, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-10", "c": 36, "o": 41, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-11", "c": 44, "o": 36, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-12", "c": 39, "o": 44, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-15", "c": 49, "o": 39, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-16", "c": 46, "o": 49, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-17", "c": 38, "o": 46, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-18", "c": 42, "o": 38, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-19", "c": 44, "o": 42, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-22", "c": 55, "o": 44, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-23", "c": 59, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-24", "c": 58, "o": 59, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-26", "c": 55, "o": 58, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-29", "c": 48, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-30", "c": 46, "o": 48, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2025-12-31", "c": 43, "o": 46, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-02", "c": 45, "o": 43, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-05", "c": 48, "o": 45, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-06", "c": 53, "o": 48, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-07", "c": 49, "o": 53, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-08", "c": 48, "o": 49, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-09", "c": 54, "o": 48, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-12", "c": 58, "o": 54, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-13", "c": 59, "o": 58, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-14", "c": 59, "o": 59, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-15", "c": 64, "o": 59, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-16", "c": 64, "o": 64, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-20", "c": 51, "o": 64, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-21", "c": 54, "o": 51, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-22", "c": 55, "o": 54, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-23", "c": 55, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-26", "c": 58, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-27", "c": 65, "o": 58, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-28", "c": 66, "o": 65, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-29", "c": 64, "o": 66, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-01-30", "c": 59, "o": 64, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-02", "c": 63, "o": 59, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-03", "c": 43, "o": 63, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-04", "c": 47, "o": 43, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-05", "c": 35, "o": 47, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-06", "c": 45, "o": 35, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-09", "c": 48, "o": 45, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-10", "c": 47, "o": 48, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-11", "c": 50, "o": 47, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-12", "c": 36, "o": 50, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-13", "c": 34, "o": 36, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-17", "c": 33, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-18", "c": 34, "o": 33, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-19", "c": 34, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-20", "c": 42, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-23", "c": 33, "o": 42, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-24", "c": 40, "o": 33, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-25", "c": 43, "o": 40, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-26", "c": 43, "o": 43, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-02-27", "c": 41, "o": 43, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-02", "c": 34, "o": 41, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-03", "c": 32, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-04", "c": 33, "o": 32, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-05", "c": 32, "o": 33, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-06", "c": 25, "o": 32, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-09", "c": 22, "o": 25, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-10", "c": 20, "o": 22, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-11", "c": 18, "o": 20, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-13", "c": 17, "o": 18, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-16", "c": 24, "o": 17, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-17", "c": 23, "o": 24, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-18", "c": 14, "o": 23, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-19", "c": 18, "o": 14, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-20", "c": 8, "o": 18, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-23", "c": 12, "o": 8, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-24", "c": 10, "o": 12, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-25", "c": 17, "o": 10, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-26", "c": 10, "o": 17, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-27", "c": 8, "o": 10, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-30", "c": 6, "o": 8, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-03-31", "c": 15, "o": 6, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-01", "c": 16, "o": 15, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-02", "c": 18, "o": 16, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-06", "c": 22, "o": 18, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-07", "c": 22, "o": 22, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-08", "c": 29, "o": 22, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-09", "c": 34, "o": 29, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-10", "c": 38, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-13", "c": 41, "o": 38, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-14", "c": 47, "o": 41, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-15", "c": 56, "o": 47, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-16", "c": 61, "o": 56, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-17", "c": 69, "o": 61, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-20", "c": 70, "o": 69, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-21", "c": 68, "o": 70, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-22", "c": 68, "o": 68, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-23", "c": 66, "o": 68, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-24", "c": 65, "o": 66, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-27", "c": 66, "o": 65, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-28", "c": 67, "o": 66, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-29", "c": 66, "o": 67, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-04-30", "c": 70, "o": 66, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-01", "c": 71, "o": 70, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-04", "c": 67, "o": 71, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-05", "c": 67, "o": 67, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-06", "c": 69, "o": 67, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-07", "c": 67, "o": 69, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-08", "c": 67, "o": 67, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-11", "c": 67, "o": 67, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-12", "c": 66, "o": 67, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-13", "c": 65, "o": 66, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-14", "c": 66, "o": 65, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-15", "c": 63, "o": 66, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-18", "c": 62, "o": 63, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-19", "c": 59, "o": 62, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-20", "c": 61, "o": 59, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-21", "c": 58, "o": 61, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-22", "c": 58, "o": 58, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-26", "c": 60, "o": 58, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-27", "c": 61, "o": 60, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-28", "c": 61, "o": 61, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-05-29", "c": 60, "o": 61, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-01", "c": 59, "o": 60, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-02", "c": 57, "o": 59, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-03", "c": 55, "o": 57, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-04", "c": 55, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-05", "c": 42, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-08", "c": 39, "o": 42, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-09", "c": 34, "o": 39, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-10", "c": 27, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-11", "c": 30, "o": 27, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-12", "c": 34, "o": 30, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-15", "c": 40, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-16", "c": 40, "o": 40, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-17", "c": 33, "o": 40, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-18", "c": 37, "o": 33, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-22", "c": 34, "o": 37, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-23", "c": 28, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-24", "c": 26, "o": 28, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-25", "c": 25, "o": 26, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-26", "c": 25, "o": 25, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-29", "c": 27, "o": 25, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-06-30", "c": 30, "o": 27, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-01", "c": 32, "o": 30, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-02", "c": 33, "o": 32, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-06", "c": 42, "o": 33, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-07", "c": 40, "o": 42, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-08", "c": 39, "o": 40, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-09", "c": 45, "o": 39, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-10", "c": 47, "o": 45, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-13", "c": 41, "o": 47, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-14", "c": 41, "o": 41, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-15", "c": 44, "o": 41, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-16", "c": 42, "o": 44, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-17", "c": 37, "o": 42, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-20", "c": 36, "o": 37, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-21", "c": 43, "o": 36, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-22", "c": 44, "o": 43, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-23", "c": 41, "o": 44, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-24", "c": 41, "o": 41, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-27", "c": 38, "o": 41, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-28", "c": 37, "o": 38, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-29", "c": 26, "o": 37, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-30", "c": 38, "o": 26, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-07-31", "c": 40, "o": 38, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-03", "c": 46, "o": 40, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-04", "c": 59, "o": 46, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-05", "c": 60, "o": 59, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-06", "c": 60, "o": 60, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-07", "c": 65, "o": 60, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-10", "c": 64, "o": 65, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-11", "c": 60, "o": 64, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-12", "c": 62, "o": 60, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-13", "c": 66, "o": 62, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-14", "c": 64, "o": 66, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-17", "c": 59, "o": 64, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-18", "c": 55, "o": 59, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-19", "c": 57, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-20", "c": 51, "o": 57, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-21", "c": 55, "o": 51, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-24", "c": 55, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-25", "c": 60, "o": 55, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-26", "c": 54, "o": 60, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-27", "c": 57, "o": 54, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-28", "c": 54, "o": 57, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-08-31", "c": 49, "o": 54, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-01", "c": 45, "o": 49, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-02", "c": 46, "o": 45, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-03", "c": 48, "o": 46, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-04", "c": 45, "o": 48, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-08", "c": 39, "o": 45, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-09", "c": 38, "o": 39, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-10", "c": 32, "o": 38, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-11", "c": 33, "o": 32, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-14", "c": 32, "o": 33, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-15", "c": 29, "o": 32, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-16", "c": 27, "o": 29, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-17", "c": 29, "o": 27, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-18", "c": 28, "o": 29, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-21", "c": 34, "o": 28, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-22", "c": 35, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-23", "c": 34, "o": 35, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-24", "c": 35, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-25", "c": 37, "o": 35, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-28", "c": 32, "o": 37, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-29", "c": 31, "o": 32, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-09-30", "c": 30, "o": 31, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-01", "c": 29, "o": 30, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-02", "c": 38, "o": 29, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-05", "c": 43, "o": 38, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-06", "c": 47, "o": 43, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-07", "c": 45, "o": 47, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-08", "c": 39, "o": 45, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-09", "c": 44, "o": 39, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-12", "c": 45, "o": 44, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-13", "c": 46, "o": 45, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-14", "c": 29, "o": 46, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-15", "c": 32, "o": 29, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-16", "c": 18, "o": 32, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-19", "c": 20, "o": 18, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-20", "c": 29, "o": 20, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-21", "c": 30, "o": 29, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-22", "c": 20, "o": 30, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-23", "c": 17, "o": 20, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-26", "c": 30, "o": 17, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-27", "c": 33, "o": 30, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-28", "c": 34, "o": 33, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-29", "c": 31, "o": 34, "mn": null, "mx": null, "src": "cnn-close"}, {"d": "2026-10-30", "c": 26, "o": 31, "mn": 23, "mx": null, "src": "user-observed"}, {"d": "2026-11-02", "c": 22, "o": 26, "mn": 22, "mx": 32, "src": "tracked"}, {"d": "2026-11-03", "c": 19, "o": 21, "mn": 19, "mx": 21, "src": "tracked"}, {"d": "2026-11-04", "c": 28, "o": 23, "mn": 23, "mx": 29, "src": "tracked"}, {"d": "2026-11-05", "c": 20, "o": 28, "mn": 20, "mx": 35, "src": "tracked"}, {"d": "2026-11-06", "c": 23, "o": 20, "mn": 20, "mx": 26, "src": "tracked"}, {"d": "2026-11-09", "c": 32, "o": 24, "mn": 24, "mx": 32, "src": "tracked"}, {"d": "2026-11-10", "c": 33, "o": 32, "mn": 31, "mx": 35, "src": "tracked"}, {"d": "2026-11-11", "c": 37, "o": 36, "mn": 36, "mx": 38, "src": "tracked"}, {"d": "2026-11-12", "c": 40, "o": 37, "mn": 35, "mx": 43, "src": "tracked"}, {"d": "2026-11-13", "c": 38, "o": 40, "mn": 37, "mx": 43, "src": "tracked"}, {"d": "2026-11-16", "c": 30, "o": 38, "mn": 29, "mx": 38, "src": "tracked"}, {"d": "2026-11-17", "c": 25, "o": 30, "mn": 23, "mx": 33, "src": "tracked"}, {"d": "2026-11-18", "c": 24, "o": 25, "mn": 23, "mx": 27, "src": "tracked"}, {"d": "2026-11-19", "c": 19, "o": 24, "mn": 19, "mx": 31, "src": "tracked"}, {"d": "2026-11-20", "c": 10, "o": 17, "mn": 10, "mx": 17, "src": "tracked"}, {"d": "2026-11-23", "c": 18, "o": 16, "mn": 16, "mx": 21, "src": "tracked"}, {"d": "2026-11-24", "c": 17, "o": 18, "mn": 14, "mx": 18, "src": "tracked"}, {"d": "2026-11-25", "c": 15, "o": 11, "mn": 9, "mx": 16, "src": "tracked"}];
 var WEEK30 = [{"label": "Nov 19 3:30pm", "day": "2026-11-19", "t": "15:30", "o": 24, "h": 31, "l": 19, "c": 19, "syn": true}, {"label": "Nov 20 3:30pm", "day": "2026-11-20", "t": "15:30", "o": 17, "h": 17, "l": 10, "c": 10, "syn": true}, {"label": "Nov 23 3:30pm", "day": "2026-11-23", "t": "15:30", "o": 16, "h": 21, "l": 16, "c": 18, "syn": true}, {"label": "Nov 24 3:30pm", "day": "2026-11-24", "t": "15:30", "o": 18, "h": 18, "l": 14, "c": 17, "syn": true}, {"label": "Nov 25 3:30pm", "day": "2026-11-25", "t": "15:30", "o": 11, "h": 16, "l": 9, "c": 15, "syn": true}];
 var DAY5 = [];
+var SPXWEEK = [{"day": "2026-11-19", "t": "9:30", "c": 7380.67}, {"day": "2026-11-19", "t": "10:00", "c": 7325.22}, {"day": "2026-11-19", "t": "10:30", "c": 7307.96}, {"day": "2026-11-19", "t": "11:00", "c": 7311.36}, {"day": "2026-11-19", "t": "11:30", "c": 7255.38}, {"day": "2026-11-19", "t": "12:00", "c": 7268.56}, {"day": "2026-11-19", "t": "12:30", "c": 7235.21}, {"day": "2026-11-19", "t": "13:00", "c": 7233.48}, {"day": "2026-11-19", "t": "13:30", "c": 7218.71}, {"day": "2026-11-19", "t": "14:00", "c": 7226.23}, {"day": "2026-11-19", "t": "14:30", "c": 7197.96}, {"day": "2026-11-19", "t": "15:00", "c": 7184.66}, {"day": "2026-11-19", "t": "15:30", "c": 7177.56}, {"day": "2026-11-20", "t": "9:30", "c": 7186.52}, {"day": "2026-11-20", "t": "10:00", "c": 7120.57}, {"day": "2026-11-20", "t": "10:30", "c": 7091.84}, {"day": "2026-11-20", "t": "11:00", "c": 7071.3}, {"day": "2026-11-20", "t": "11:30", "c": 7057.48}, {"day": "2026-11-20", "t": "12:00", "c": 7023.49}, {"day": "2026-11-20", "t": "12:30", "c": 7026.15}, {"day": "2026-11-20", "t": "13:00", "c": 7016.4}, {"day": "2026-11-20", "t": "13:30", "c": 7030.65}, {"day": "2026-11-20", "t": "14:00", "c": 6963.72}, {"day": "2026-11-20", "t": "14:30", "c": 6966.75}, {"day": "2026-11-20", "t": "15:00", "c": 6942.01}, {"day": "2026-11-20", "t": "15:30", "c": 6918.45}, {"day": "2026-11-23", "t": "9:30", "c": 7229.51}, {"day": "2026-11-23", "t": "10:00", "c": 7277.96}, {"day": "2026-11-23", "t": "10:30", "c": 7260.25}, {"day": "2026-11-23", "t": "11:00", "c": 7257.93}, {"day": "2026-11-23", "t": "11:30", "c": 7252.39}, {"day": "2026-11-23", "t": "12:00", "c": 7244.12}, {"day": "2026-11-23", "t": "12:30", "c": 7237.75}, {"day": "2026-11-23", "t": "13:00", "c": 7253.19}, {"day": "2026-11-23", "t": "13:30", "c": 7228.78}, {"day": "2026-11-23", "t": "14:00", "c": 7252.92}, {"day": "2026-11-23", "t": "14:30", "c": 7241.09}, {"day": "2026-11-23", "t": "15:00", "c": 7262.46}, {"day": "2026-11-23", "t": "15:30", "c": 7236.85}, {"day": "2026-11-24", "t": "9:30", "c": 7214.09}, {"day": "2026-11-24", "t": "10:00", "c": 7164.1}, {"day": "2026-11-24", "t": "10:30", "c": 7161.28}, {"day": "2026-11-24", "t": "11:00", "c": 7161.4}, {"day": "2026-11-24", "t": "11:30", "c": 7157.34}, {"day": "2026-11-24", "t": "12:00", "c": 7202.92}, {"day": "2026-11-24", "t": "12:30", "c": 7208.49}, {"day": "2026-11-24", "t": "13:00", "c": 7204.16}, {"day": "2026-11-24", "t": "13:30", "c": 7186.27}, {"day": "2026-11-24", "t": "14:00", "c": 7201.79}, {"day": "2026-11-24", "t": "14:30", "c": 7176.73}, {"day": "2026-11-24", "t": "15:00", "c": 7175.73}, {"day": "2026-11-24", "t": "15:30", "c": 7202.45}, {"day": "2026-11-25", "t": "9:30", "c": 7050.15}, {"day": "2026-11-25", "t": "10:00", "c": 7001.21}, {"day": "2026-11-25", "t": "10:30", "c": 7006.4}, {"day": "2026-11-25", "t": "11:00", "c": 7014.0}, {"day": "2026-11-25", "t": "11:30", "c": 7032.19}, {"day": "2026-11-25", "t": "12:00", "c": 7083.69}, {"day": "2026-11-25", "t": "12:30", "c": 7124.19}, {"day": "2026-11-25", "t": "13:00", "c": 7164.51}, {"day": "2026-11-25", "t": "13:30", "c": 7171.22}, {"day": "2026-11-25", "t": "14:00", "c": 7193.37}, {"day": "2026-11-25", "t": "14:30", "c": 7170.88}, {"day": "2026-11-25", "t": "15:00", "c": 7171.2}, {"day": "2026-11-25", "t": "15:30", "c": 7182.73}];
+var SPXDAY = {"day": null, "pts": []};
+var spxOn = true;
+var SPXCOL = "#e8b13c";
+var SPXW = 50;
 var BANDS = [
   {lo: 75.5, hi: 100,  color: "rgba(46,170,95,0.20)",  label: "Extreme Greed"},
   {lo: 54.5, hi: 75.5, color: "rgba(46,170,95,0.10)",  label: "Greed"},
@@ -137,6 +148,37 @@ function drawFrame(Y, dom) {
     t.textContent = v;
     svg.appendChild(t);
   });
+}
+// SPX overlay helpers (1W and 1D only): the amber line lives on
+// its own right-hand axis, auto-scaled to the SPX range in view
+function spxDomain(vals) {
+  var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+  var pad = Math.max(2, 0.08 * (mx - mn));
+  var lo = mn - pad, hi = mx + pad;
+  if (hi - lo < 4) { var mid = (lo + hi) / 2; lo = mid - 2; hi = mid + 2; }
+  return [lo, hi];
+}
+function spxTicks(lo, hi) {
+  var steps = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000];
+  for (var i = 0; i < steps.length; i++) {
+    var s = steps[i], ticks = [];
+    for (var v = Math.ceil(lo / s) * s; v <= hi + 1e-9; v += s) ticks.push(v);
+    if (ticks.length >= 3 && ticks.length <= 6) return ticks;
+  }
+  return [lo, hi];
+}
+function fmtSpx(v) {
+  return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+function drawSpxAxis(Y2, sdom) {
+  spxTicks(sdom[0], sdom[1]).forEach(function(v) {
+    var t = el("text", {x: ML + PW + 30, y: Y2(v) + 4, "class": "axis"});
+    t.textContent = fmtSpx(v);
+    svg.appendChild(t);
+  });
+  var cap = el("text", {x: ML + PW + 30, y: H + 12, "class": "spxlabel"});
+  cap.textContent = "SPX";
+  svg.appendChild(cap);
 }
 function dailyCandles(rows) {
   return rows.map(function(r) {
@@ -414,6 +456,41 @@ function drawWeek() {
   var lt = el("text", {x: ML + PW + 6, y: Y(lastC) + 4, "class": "latesttag"});
   lt.textContent = lastC;
   svg.appendChild(lt);
+  // SPX overlay: the S&P 500's 30-minute closes on their own
+  // right-hand axis. Each point sits in the same day band and
+  // half-hour slot as the F&G bucket it aligns with; days with
+  // no F&G band take no space, as everywhere in this view. The
+  // viewBox widens to make room for the second axis - the F&G
+  // geometry itself does not move.
+  if (spxOn && SPXWEEK.length) {
+    var dayGi = {};
+    groups.forEach(function(g, gi) { dayGi[g.day] = gi; });
+    var spts = [];
+    SPXWEEK.forEach(function(p) {
+      if (!(p.day in dayGi)) return;
+      var pr = p.t.split(":");
+      var si = ((+pr[0]) * 60 + (+pr[1]) - 570) / 30;
+      spts.push({x: ML + band * dayGi[p.day] + slot * (si + 0.5),
+                 c: p.c, label: p.day + " " + p.t + " ET"});
+    });
+    if (spts.length >= 2) {
+      spts.sort(function(a, b) { return a.x - b.x; });
+      var sdomW = spxDomain(spts.map(function(p) { return p.c; }));
+      var Y2W = function(v) { return MT + (sdomW[1] - v) / (sdomW[1] - sdomW[0]) * PH; };
+      svg.setAttribute("viewBox", "0 0 " + (W + SPXW) + " " + HH);
+      svg.appendChild(el("polyline", {
+        points: spts.map(function(p) { return p.x + "," + Y2W(p.c); }).join(" "),
+        fill: "none", stroke: SPXCOL, "stroke-width": 1.5}));
+      spts.forEach(function(p) {
+        var dot = el("circle", {cx: p.x, cy: Y2W(p.c), r: 2, fill: SPXCOL});
+        var tt = document.createElementNS(NS, "title");
+        tt.textContent = p.label + "\nS&P 500 (30-min close): " + p.c;
+        dot.appendChild(tt);
+        svg.appendChild(dot);
+      });
+      drawSpxAxis(Y2W, sdomW);
+    }
+  }
 }
 function drawDay() {
   while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -499,17 +576,58 @@ function drawDay() {
   var lt = el("text", {x: ML + PW + 6, y: Y(lastP.v) + 4, "class": "latesttag"});
   lt.textContent = lastP.v;
   svg.appendChild(lt);
+  // SPX overlay: the session's 5-minute closes at their close
+  // times, on their own right-hand axis - only when the SPX
+  // series is this session's own date
+  if (spxOn && SPXDAY.pts && SPXDAY.pts.length >= 2 &&
+      SPXDAY.day === DAY5[0].label.slice(0, 10)) {
+    var sdomD = spxDomain(SPXDAY.pts.map(function(p) { return p.c; }));
+    var Y2D = function(v) { return MT + (sdomD[1] - v) / (sdomD[1] - sdomD[0]) * PH; };
+    svg.setAttribute("viewBox", "0 0 " + (W + SPXW) + " " + HH);
+    svg.appendChild(el("polyline", {
+      points: SPXDAY.pts.map(function(p) { return X(p.m) + "," + Y2D(p.c); }).join(" "),
+      fill: "none", stroke: SPXCOL, "stroke-width": 1.5}));
+    SPXDAY.pts.forEach(function(p) {
+      var dot = el("circle", {cx: X(p.m), cy: Y2D(p.c), r: 1.8, fill: SPXCOL});
+      var tt = document.createElementNS(NS, "title");
+      tt.textContent = SPXDAY.day + " " + p.t + " ET\nS&P 500: " + p.c;
+      dot.appendChild(tt);
+      svg.appendChild(dot);
+    });
+    drawSpxAxis(Y2D, sdomD);
+  }
 }
-var btns = document.querySelectorAll("#ranges button");
+var btns = document.querySelectorAll("#ranges button:not([data-spx])");
+var curView = {kind: "days", days: 100000};
+function redraw() {
+  if (curView.kind === "week") drawWeek();
+  else if (curView.kind === "day") drawDay();
+  else draw(curView.days);
+}
 btns.forEach(function(b) {
   b.addEventListener("click", function() {
     btns.forEach(function(x) { x.classList.remove("active"); });
     b.classList.add("active");
-    if (b.getAttribute("data-view") === "week") drawWeek();
-    else if (b.getAttribute("data-view") === "day") drawDay();
-    else draw(parseInt(b.getAttribute("data-days"), 10));
+    if (b.getAttribute("data-view") === "week") curView = {kind: "week"};
+    else if (b.getAttribute("data-view") === "day") curView = {kind: "day"};
+    else curView = {kind: "days", days: parseInt(b.getAttribute("data-days"), 10)};
+    redraw();
   });
 });
+var spxBtn = document.querySelector("#ranges button[data-spx]");
+if (spxBtn) {
+  // with no SPX data embedded (the build-time fetch failed) the
+  // toggle has nothing to show - hide it rather than offer a
+  // dead control
+  if (!SPXWEEK.length && !(SPXDAY.pts && SPXDAY.pts.length)) {
+    spxBtn.style.display = "none";
+  }
+  spxBtn.addEventListener("click", function() {
+    spxOn = !spxOn;
+    spxBtn.classList.toggle("active", spxOn);
+    redraw();
+  });
+}
 draw(100000);
 </script>
 </body>
