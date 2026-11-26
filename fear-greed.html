@@ -75,7 +75,8 @@ candlesticks in the 1M at
 half the width of the F&amp;G candles, lifted
 clear of the candles by the overlay scale&rsquo;s floor (about 6,600 for
 SPX; the NASDAQ floor starts at the month&rsquo;s lows and drops only
-until its candles clear their own days&rsquo;) (body = the
+until its candles clear their own days&rsquo; candles and printed
+high and low numbers) (body = the
 open to the close, coloured teal when the index closed up
 on the day and red when it closed down, and the wick = the day&rsquo;s
 full range, grey like the F&amp;G candles&rsquo; wicks), and an amber line in the 1W
@@ -401,7 +402,8 @@ function draw(maxDays) {
       // candlestick up the plot, clear of the candles. The
       // floor then drops in small steps only until no day's
       // candlestick touches its own day's candle (body or
-      // wick) - the per-day no-touch rule governs, not a
+      // wick) or that day's printed high/low labels - the
+      // per-day no-touch rule governs, not a
       // blanket lane (an earlier build forced every bar above
       // the month's highest candle; that was overdone - they
       // just must not touch). Candlesticks may sit below
@@ -414,10 +416,32 @@ function draw(maxDays) {
         return MT + (sdomM[1] - v) / (sdomM[1] - sdomM[0]) * PH;
       };
       var CLEAR = 4;
+      // the per-day obstacle is the day's candle PLUS its
+      // range labels. In this view a tracked day's high is
+      // printed above its wick and its low below it, outside
+      // the candle's own span - a wick that clears the candle
+      // can still strike the printed number (Stoo, 2026-11-26:
+      // on the NASDAQ overlay, Friday Nov 20's wick overlapped
+      // the F&G high number; the candle-only obstacle left
+      // NASDAQ's tightest clearance at 3.5px). The label boxes
+      // replicate the label drawing exactly: the high label's
+      // baseline sits at max(MT+9, Y(h)-5) and its 8px glyphs
+      // rise ~8px above the baseline; the low label's baseline
+      // sits at min(MT+PH-1, Y(l)+13) and its box reaches ~2px
+      // below the baseline; each box is padded by LCLEAR.
+      var LCLEAR = 3;
+      function dayObstacle(k) {
+        var top = Y(k.h), bot = Y(k.l);
+        if (k.tracked) {
+          top = Math.min(top, Math.max(MT + 9, Y(k.h) - 5) - 8 - LCLEAR);
+          bot = Math.max(bot, Math.min(MT + PH - 1, Y(k.l) + 13) + 2 + LCLEAR);
+        }
+        return [top, bot];
+      }
       function spxTouches() {
         for (var j = 0; j < sptsM.length; j++) {
-          var p = sptsM[j], k = candles[p.i];
-          if (Y2M(p.l) > Y(k.h) - CLEAR && Y2M(p.h) < Y(k.l) + CLEAR) return true;
+          var p = sptsM[j], ob = dayObstacle(candles[p.i]);
+          if (Y2M(p.l) > ob[0] - CLEAR && Y2M(p.h) < ob[1] + CLEAR) return true;
         }
         return false;
       }
