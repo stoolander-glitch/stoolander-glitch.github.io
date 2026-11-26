@@ -43,12 +43,12 @@ samples recorded yet shows its daily candle &mdash; the same candle the
 plots the most recent session&rsquo;s <b>5-minute samples as a line</b> &mdash;
 a tick chart, one dot per sample across the 9:30&ndash;16:00 ET session, no
 candles. In the <b>1M, 1W and 1D</b> views an <b>S&amp;P 500</b>
-overlay sits on its own right-hand axis &mdash; daily OHLC bars in
+overlay sits on its own right-hand axis &mdash; daily candlesticks in
 the 1M, a line of 30-minute closes in the 1W, a line of 5-minute
 closes in the 1D &mdash; toggled by the <b>SPX</b> button. The 1M
-bars are coloured like the candles &mdash; teal when SPX closed up on
-the day, red when it closed down, amber only when exactly flat; the
-1W and 1D lines stay amber.
+candlesticks, at half the width of the F&amp;G candles, are coloured
+like them &mdash; teal when SPX closed up on the day, red when it
+closed down; the 1W and 1D lines stay amber.
 History from 2025-10-30.</p>
 <p class="latest">Latest day (2026-11-25): open 11 &middot; high 16 &middot; low 9 &middot; close 15</p>
 <div class="ranges" id="ranges">
@@ -66,13 +66,12 @@ bar&rsquo;s. Days are spaced evenly &mdash; weekends and holidays take no space.
 In the 1D view, the line joins the session&rsquo;s 5-minute samples and the
 day&rsquo;s high and low samples are labelled; hover any dot for its time and
 value. The overlay in the 1M, 1W and 1D views is the S&amp;P 500 (SPX)
-on its own right-hand axis &mdash; daily OHLC bars in the 1M, lifted
-clear of the candles by the SPX scale&rsquo;s floor at about 6,600 (stem = the
-day&rsquo;s range, left tick = open, right tick = close; the stem&rsquo;s
-span between the open and the close is coloured teal when SPX closed up
-on the day and red when it closed down &mdash; amber only when exactly
-flat &mdash; and the ticks and the rest of the stem are grey, like the
-candles&rsquo; wicks), and an amber line in the 1W
+on its own right-hand axis &mdash; daily candlesticks in the 1M at
+half the width of the F&amp;G candles, lifted
+clear of the candles by the SPX scale&rsquo;s floor at about 6,600 (body = the
+open to the close, coloured teal when SPX closed up
+on the day and red when it closed down, and the wick = the day&rsquo;s
+full range, grey like the F&amp;G candles&rsquo; wicks), and an amber line in the 1W
 and 1D; hover it for values, and use the SPX button to show or hide it.</p>
 <script>
 "use strict";
@@ -85,10 +84,9 @@ var SPXDAILY = [{"d": "2026-08-26", "o": 7666.88, "h": 7690.73, "l": 7657.41, "c
 var spxOn = true;
 var SPXCOL = "#e8b13c";
 // every wick is drawn in the high/low labels' grey: the F&G
-// candles' high-low line in full, and on the 1M SPX bars both
-// the stems outside the open-close span AND the open/close
-// ticks - only that central span, the bar's body, takes the
-// direction colour. The open and close carry the direction
+// candles' high-low line in full, and the 1M SPX candlesticks'
+// high-low line likewise - a candlestick's body is what takes
+// the direction colour. The open and close carry the direction
 // colour, the wick is context (Stoo, 2026-11-26)
 var WICKCOL = "#7f8ea9";
 var SPXW = 50;
@@ -337,18 +335,21 @@ function draw(maxDays) {
   var lt = el("text", {x: ML + PW + 6, y: Y(lastC) + 4, "class": "latesttag"});
   lt.textContent = lastC;
   svg.appendChild(lt);
-  // SPX overlay (1M view only): the S&P 500's daily OHLC bars
-  // at the candles' own x positions, on their own right-hand
-  // axis, under the same SPX toggle as the 1W and 1D overlays.
-  // Bars, not a close line: the line hid each day's intraday
-  // range (Nov 25 ranged 6,977-7,193 and showed as one point).
-  // The bars share the plot with the candles; the raise is in
-  // the SPX scale itself - the domain floor sits at about
-  // 6,600 (Stoo's eyeballed target), the top following the
-  // days' highs plus the usual padding, and the floor drops
-  // further only if a day's bar would still touch its own
-  // candle. The viewBox widens to make room for the second
-  // axis - the F&G geometry itself does not move.
+  // SPX overlay (1M view only): the S&P 500's daily
+  // candlesticks at the candles' own x positions, on their
+  // own right-hand axis, under the same SPX toggle as the 1W
+  // and 1D overlays. Candlesticks, not a close line: the line
+  // hid each day's intraday range (Nov 25 ranged 6,977-7,193
+  // and showed as one point). Each SPX candlestick is drawn
+  // at HALF the F&G body width, so the two series cannot be
+  // visually confused. The candlesticks share the plot with
+  // the candles; the raise is in the SPX scale itself - the
+  // domain floor sits at about 6,600 (Stoo's eyeballed
+  // target), the top following the days' highs plus the
+  // usual padding, and the floor drops further only if a
+  // day's candlestick would still touch its own candle. The
+  // viewBox widens to make room for the second axis - the
+  // F&G geometry itself does not move.
   if (maxDays === 31 && spxOn && SPXDAILY.length) {
     var dmap = {};
     SPXDAILY.forEach(function(p) { dmap[p.d] = p; });
@@ -367,14 +368,15 @@ function draw(maxDays) {
       // sits at about 6,600 - his eyeballed target - with the
       // top following the month's highs plus the usual
       // padding. Extending the domain downward lifts every
-      // bar up the plot, clear of the candles. The floor
-      // then drops in small steps only until no day's bar
-      // touches its own day's candle (body or wick) - the
-      // per-day no-touch rule governs, not a blanket lane
-      // (an earlier build forced every bar above the month's
-      // highest candle; that was overdone - the bars just
-      // must not touch). Bars may sit below other days'
-      // candles and below the month's highest candle.
+      // candlestick up the plot, clear of the candles. The
+      // floor then drops in small steps only until no day's
+      // candlestick touches its own day's candle (body or
+      // wick) - the per-day no-touch rule governs, not a
+      // blanket lane (an earlier build forced every bar above
+      // the month's highest candle; that was overdone - they
+      // just must not touch). Candlesticks may sit below
+      // other days' candles and below the month's highest
+      // candle.
       if (sdomM[0] > 6600) sdomM[0] = 6600;
       var Y2M = function(v) {
         return MT + (sdomM[1] - v) / (sdomM[1] - sdomM[0]) * PH;
@@ -391,37 +393,36 @@ function draw(maxDays) {
       while (spxTouches() && guard++ < 400) sdomM[0] -= 5;
       svg.setAttribute("viewBox", "0 0 " + (W + SPXW) + " " + HH);
       sptsM.forEach(function(p) {
-        // coloured like the F&G candles by the day's direction:
-        // teal up, red down, amber only when exactly flat
-        var bcol = p.c > p.o ? "#32A499" : (p.c < p.o ? "#AD5650" : SPXCOL);
-        // the stem is drawn in segments, under the same body/wick
-        // logic as the candles: the span between the open and the
-        // close is the bar's body and takes the direction colour;
-        // only the stem outside that span - high down to the
-        // higher of open/close, and the lower of open/close down
-        // to the low - is true wick and stays grey. Zero-length
-        // segments are skipped (Stoo, 2026-11-26: a fully grey
-        // stem was overdone - the bar needs its coloured centre).
-        var yH = Y2M(p.h), yL = Y2M(p.l);
-        var yTop = Y2M(Math.max(p.o, p.c)), yBot = Y2M(Math.min(p.o, p.c));
-        var segs = [];
-        if (yTop > yH) segs.push([yH, yTop, WICKCOL]);
-        if (yBot > yTop) segs.push([yTop, yBot, bcol]);
-        if (yL > yBot) segs.push([yBot, yL, WICKCOL]);
-        if (!segs.length) segs.push([yH, yL, WICKCOL]);
-        var tt = document.createElementNS(NS, "title");
-        tt.textContent = p.label + "\nS&P 500: Open: " + p.o + " · High: " + p.h +
+        // an SPX candlestick in the same candle language as the
+        // F&G series (Stoo, 2026-11-26): a filled body spanning
+        // the open to the close in the direction colour - teal
+        // up, red down, and exactly flat takes the candles'
+        // flat treatment (muted grey body, light outline) -
+        // with the full high-low wick in the wick grey, drawn
+        // at HALF the F&G body width (sbw = bw / 2) so the two
+        // series cannot be visually confused. (The earlier
+        // OHLC bars - grey ticks, the stem's open-close span
+        // coloured - went away with the bar form; a
+        // candlestick has no ticks.)
+        var flat = p.c === p.o;
+        var bcol = flat ? "#b4bfd2" : (p.c > p.o ? "#32A499" : "#AD5650");
+        var yH = Y2M(p.h), yL = Y2M(p.l), yO = Y2M(p.o), yC = Y2M(p.c);
+        var sbw = bw / 2;
+        var hover = p.label + "\nS&P 500: Open: " + p.o + " · High: " + p.h +
           " · Low: " + p.l + " · Close: " + p.c;
-        segs.forEach(function(sg, si) {
-          var seg = el("line", {x1: p.x, x2: p.x, y1: sg[0], y2: sg[1],
-            stroke: sg[2], "stroke-width": 1.5, "class": "spxbar"});
-          if (si === 0) seg.appendChild(tt);
-          svg.appendChild(seg);
-        });
-        svg.appendChild(el("line", {x1: p.x - bw / 2, x2: p.x, y1: Y2M(p.o), y2: Y2M(p.o),
-          stroke: WICKCOL, "stroke-width": 1.5, "class": "spxbar"}));
-        svg.appendChild(el("line", {x1: p.x, x2: p.x + bw / 2, y1: Y2M(p.c), y2: Y2M(p.c),
-          stroke: WICKCOL, "stroke-width": 1.5, "class": "spxbar"}));
+        var wick = el("line", {x1: p.x, x2: p.x, y1: yH, y2: yL,
+          stroke: WICKCOL, "stroke-width": 1.5, "class": "spxcandle"});
+        var wtt = document.createElementNS(NS, "title");
+        wtt.textContent = hover;
+        wick.appendChild(wtt);
+        svg.appendChild(wick);
+        var sbody = el("rect", {x: p.x - sbw / 2, y: Math.min(yO, yC), width: sbw,
+          height: Math.max(1.6, Math.abs(yC - yO)), fill: flat ? "#8e9bb1" : bcol,
+          stroke: bcol, "stroke-width": 1.5, "class": "spxcandle"});
+        var tt = document.createElementNS(NS, "title");
+        tt.textContent = hover;
+        sbody.appendChild(tt);
+        svg.appendChild(sbody);
       });
       drawSpxAxis(Y2M, sdomM);
     }
