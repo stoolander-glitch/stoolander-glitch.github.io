@@ -186,7 +186,7 @@ function draw(maxDays) {
     svg.appendChild(lab);
   });
   // y gridlines + labels
-  [0, 25, 50, 75, 100].forEach(function(v) {
+  [0, 25, 45, 55, 75, 100].forEach(function(v) {
     svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
       stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
     var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
@@ -287,7 +287,7 @@ function drawWeek() {
     lab.textContent = b.label;
     svg.appendChild(lab);
   });
-  [0, 25, 50, 75, 100].forEach(function(v) {
+  [0, 25, 45, 55, 75, 100].forEach(function(v) {
     svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
       stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
     var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
@@ -416,7 +416,7 @@ function drawDay() {
     lab.textContent = b.label;
     svg.appendChild(lab);
   });
-  [0, 25, 50, 75, 100].forEach(function(v) {
+  [0, 25, 45, 55, 75, 100].forEach(function(v) {
     svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
       stroke: v === 0 || v === 100 ? "rgba(163,178,205,0.32)" : "rgba(163,178,205,0.13)", "stroke-width": 1}));
     var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
