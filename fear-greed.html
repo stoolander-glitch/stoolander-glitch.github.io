@@ -189,7 +189,7 @@ function draw(maxDays) {
       (daily ? "" : "\n(weekly candle from daily closes)");
     svg.appendChild(el("line", {x1: cx, x2: cx, y1: yH, y2: yL, stroke: col, "stroke-width": 1.5}));
     var body = el("rect", {x: cx - bw / 2, y: Math.min(yO, yC), width: bw,
-      height: Math.max(1.6, Math.abs(yC - yO)), fill: up ? "#fff" : col,
+      height: Math.max(1.6, Math.abs(yC - yO)), fill: k.c === k.o ? "#fff" : col,
       stroke: col, "stroke-width": 1.5});
     var tt = document.createElementNS(NS, "title");
     tt.textContent = title;
@@ -295,7 +295,7 @@ function drawWeek() {
         "\n(30-minute candle from intraday samples)";
     svg.appendChild(el("line", {x1: cx, x2: cx, y1: yH, y2: yL, stroke: col, "stroke-width": 1.5}));
     var body = el("rect", {x: cx - bw / 2, y: Math.min(yO, yC), width: bw,
-      height: Math.max(1.6, Math.abs(yC - yO)), fill: up ? "#fff" : col,
+      height: Math.max(1.6, Math.abs(yC - yO)), fill: k.c === k.o ? "#fff" : col,
       stroke: col, "stroke-width": 1.5});
     var tt = document.createElementNS(NS, "title");
     tt.textContent = title;
