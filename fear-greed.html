@@ -66,7 +66,8 @@ bar&rsquo;s. Days are spaced evenly &mdash; weekends and holidays take no space.
 In the 1D view, the line joins the session&rsquo;s 5-minute samples and the
 day&rsquo;s high and low samples are labelled; hover any dot for its time and
 value. The overlay in the 1M, 1W and 1D views is the S&amp;P 500 (SPX)
-on its own right-hand axis &mdash; daily OHLC bars in the 1M (stem = the
+on its own right-hand axis &mdash; daily OHLC bars in the 1M, in their
+own lane at the top of the plot, clear of the candles (stem = the
 day&rsquo;s range, left tick = open, right tick = close; the stem&rsquo;s
 span between the open and the close is coloured teal when SPX closed up
 on the day and red when it closed down &mdash; amber only when exactly
@@ -194,6 +195,20 @@ function drawSpxAxis(Y2, sdom) {
     svg.appendChild(t);
   });
   var cap = el("text", {x: ML + PW + 30, y: H + 12, "class": "spxlabel"});
+  cap.textContent = "SPX";
+  svg.appendChild(cap);
+}
+function drawSpxAxisM(Y2, sdom, laneTop) {
+  // the 1M lane's axis: tick labels inside the lane on the
+  // right, and the SPX caption in the lane's header strip.
+  // (drawSpxAxis, with its caption below the plot, serves
+  // the full-height 1W and 1D overlays.)
+  spxTicks(sdom[0], sdom[1]).forEach(function(v) {
+    var t = el("text", {x: ML + PW + 30, y: Y2(v) + 4, "class": "axis"});
+    t.textContent = fmtSpx(v);
+    svg.appendChild(t);
+  });
+  var cap = el("text", {x: ML + PW + 30, y: laneTop + 10, "class": "spxlabel"});
   cap.textContent = "SPX";
   svg.appendChild(cap);
 }
@@ -342,6 +357,8 @@ function draw(maxDays) {
   // Bars, not a close line: the line hid each day's intraday
   // range (Nov 25 ranged 6,977-7,193 and showed as one point).
   // The axis domain comes from the days' highs and lows. The
+  // bars sit in their own lane at the top of the plot (see
+  // the lane computation below), clear of the candles. The
   // viewBox widens to make room for the second axis - the F&G
   // geometry itself does not move.
   if (maxDays === 31 && spxOn && SPXDAILY.length) {
@@ -358,8 +375,34 @@ function draw(maxDays) {
       var svalsM = [];
       sptsM.forEach(function(p) { svalsM.push(p.l, p.h); });
       var sdomM = spxDomain(svalsM);
-      var Y2M = function(v) { return MT + (sdomM[1] - v) / (sdomM[1] - sdomM[0]) * PH; };
+      // the SPX lane (Stoo, 2026-11-26): the bars get their own
+      // band at the TOP of the plot - from the plot top down to
+      // just above the highest F&G candle in view, with a clear
+      // margin - so the two series can never overlap (on Nov 20
+      // and Nov 25 the shared full-height scale obscured both).
+      // The F&G mapping is untouched. If the headroom above the
+      // candles is under 20% of the plot height, the lane is
+      // the top 25% of the plot instead, and the hard clip
+      // below keeps every bar inside the lane either way. The
+      // lane's top 13px are a header strip holding the SPX
+      // caption; the SPX domain maps into the rest of the lane.
+      var fgTopY = Infinity;
+      candles.forEach(function(k) { fgTopY = Math.min(fgTopY, Y(k.h)); });
+      var laneTop = MT, laneBot = fgTopY - 14;
+      if (laneBot - laneTop < 0.20 * PH) laneBot = MT + 0.25 * PH;
+      var LANEHDR = 13;
+      var Y2M = function(v) {
+        return laneTop + LANEHDR +
+          (sdomM[1] - v) / (sdomM[1] - sdomM[0]) * (laneBot - laneTop - LANEHDR);
+      };
       svg.setAttribute("viewBox", "0 0 " + (W + SPXW) + " " + HH);
+      var defs = el("defs", {});
+      var cp = el("clipPath", {id: "spxlaneclip"});
+      cp.appendChild(el("rect", {x: ML - 40, y: laneTop,
+        width: PW + 80, height: laneBot - laneTop}));
+      defs.appendChild(cp);
+      svg.appendChild(defs);
+      var lane = el("g", {"clip-path": "url(#spxlaneclip)"});
       sptsM.forEach(function(p) {
         // coloured like the F&G candles by the day's direction:
         // teal up, red down, amber only when exactly flat
@@ -386,14 +429,15 @@ function draw(maxDays) {
           var seg = el("line", {x1: p.x, x2: p.x, y1: sg[0], y2: sg[1],
             stroke: sg[2], "stroke-width": 1.5, "class": "spxbar"});
           if (si === 0) seg.appendChild(tt);
-          svg.appendChild(seg);
+          lane.appendChild(seg);
         });
-        svg.appendChild(el("line", {x1: p.x - bw / 2, x2: p.x, y1: Y2M(p.o), y2: Y2M(p.o),
+        lane.appendChild(el("line", {x1: p.x - bw / 2, x2: p.x, y1: Y2M(p.o), y2: Y2M(p.o),
           stroke: WICKCOL, "stroke-width": 1.5, "class": "spxbar"}));
-        svg.appendChild(el("line", {x1: p.x, x2: p.x + bw / 2, y1: Y2M(p.c), y2: Y2M(p.c),
+        lane.appendChild(el("line", {x1: p.x, x2: p.x + bw / 2, y1: Y2M(p.c), y2: Y2M(p.c),
           stroke: WICKCOL, "stroke-width": 1.5, "class": "spxbar"}));
       });
-      drawSpxAxis(Y2M, sdomM);
+      svg.appendChild(lane);
+      drawSpxAxisM(Y2M, sdomM, laneTop);
     }
   }
 }
