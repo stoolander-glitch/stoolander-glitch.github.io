@@ -111,7 +111,11 @@ function yTicks(lo, hi) {
 function drawFrame(Y, dom) {
   // zone bands clipped to the domain - a band's label shows only
   // where the band itself intersects the domain - and gridlines
-  // at the domain's ticks, their values on the right axis
+  // at the domain's ticks, their values on the right axis. A tick
+  // that lands on a zone boundary integer is drawn at the band
+  // edge itself (the half-point between the two zones' integer
+  // scores), labelled with the integer - the fixed views'
+  // convention, so the line and the colour change coincide
   BANDS.forEach(function(b) {
     var blo = Math.max(b.lo, dom[0]), bhi = Math.min(b.hi, dom[1]);
     if (bhi <= blo) return;
@@ -120,10 +124,16 @@ function drawFrame(Y, dom) {
     lab.textContent = b.label;
     svg.appendChild(lab);
   });
+  var EDGE = {25: 25.5, 45: 45.5, 55: 54.5, 75: 75.5};
   yTicks(dom[0], dom[1]).forEach(function(v) {
-    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
+    // a tick on a zone boundary integer is drawn at the band
+    // edge itself, labelled with the integer; the shift applies
+    // only where the edge is in view - outside the domain the
+    // band is clipped away and the tick is an ordinary gridline
+    var yv = Y((v in EDGE && EDGE[v] >= dom[0] && EDGE[v] <= dom[1]) ? EDGE[v] : v);
+    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: yv, y2: yv,
       stroke: "rgba(163,178,205,0.13)", "stroke-width": 1}));
-    var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
+    var t = el("text", {x: ML + PW + 6, y: yv + 4, "class": "axis"});
     t.textContent = v;
     svg.appendChild(t);
   });
