@@ -86,6 +86,48 @@ function fmtTick(ms) {
   return mon + " \u2019" + String(d.getUTCFullYear()).slice(2);
 }
 function weekStart(ms) { return ms - ((new Date(ms).getUTCDay() + 6) % 7) * 86400000; }
+// Auto-scaled y axis for the 1M, 1W and 1D views: the domain is the
+// data range padded by max(3, 15% of the range), widened to a
+// 10-point minimum span, clamped to [0, 100]
+function yDomain(vals) {
+  var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+  var pad = Math.max(3, 0.15 * (mx - mn));
+  var lo = mn - pad, hi = mx + pad;
+  if (hi - lo < 10) { var mid = (lo + hi) / 2; lo = mid - 5; hi = mid + 5; }
+  return [Math.max(0, lo), Math.min(100, hi)];
+}
+function yTicks(lo, hi) {
+  // nice steps (5/10/20) giving roughly 4-6 ticks inside the domain
+  var best = null, bestScore = Infinity;
+  [5, 10, 20].forEach(function(step) {
+    var ticks = [];
+    for (var v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) ticks.push(v);
+    var score = Math.abs(ticks.length - 5) +
+      (ticks.length >= 4 && ticks.length <= 6 ? 0 : 100);
+    if (score < bestScore) { bestScore = score; best = ticks; }
+  });
+  return best;
+}
+function drawFrame(Y, dom) {
+  // zone bands clipped to the domain - a band's label shows only
+  // where the band itself intersects the domain - and gridlines
+  // at the domain's ticks, their values on the right axis
+  BANDS.forEach(function(b) {
+    var blo = Math.max(b.lo, dom[0]), bhi = Math.min(b.hi, dom[1]);
+    if (bhi <= blo) return;
+    svg.appendChild(el("rect", {x: ML, y: Y(bhi), width: PW, height: Y(blo) - Y(bhi), fill: b.color}));
+    var lab = el("text", {x: ML - 8, y: (Y(blo) + Y(bhi)) / 2 + 4, "text-anchor": "end", "class": "bandlabel"});
+    lab.textContent = b.label;
+    svg.appendChild(lab);
+  });
+  yTicks(dom[0], dom[1]).forEach(function(v) {
+    svg.appendChild(el("line", {x1: ML, x2: ML + PW, y1: Y(v), y2: Y(v),
+      stroke: "rgba(163,178,205,0.13)", "stroke-width": 1}));
+    var t = el("text", {x: ML + PW + 6, y: Y(v) + 4, "class": "axis"});
+    t.textContent = v;
+    svg.appendChild(t);
+  });
+}
 function dailyCandles(rows) {
   return rows.map(function(r) {
     var tracked = (r.mn !== null && r.mx !== null);
@@ -127,7 +169,19 @@ function draw(maxDays) {
   var slot = PW / n;
   var bw = Math.max(3, Math.min(22, slot * 0.55));
   function X(i) { return ML + slot * (i + 0.5); }
-  function Y(v) { return MT + (100 - v) / 100 * PH; }
+  // the 1M view auto-scales its y axis to the month in view; the
+  // longer views keep the fixed 0-100 scale
+  var scaled = (maxDays === 31);
+  var dom = [0, 100];
+  if (scaled) {
+    var dvals = [];
+    candles.forEach(function(k) { dvals.push(k.l, k.h); });
+    dom = yDomain(dvals);
+  }
+  function Y(v) { return MT + (dom[1] - v) / (dom[1] - dom[0]) * PH; }
+  if (scaled) {
+    drawFrame(Y, dom);
+  } else {
   // bands
   BANDS.forEach(function(b) {
     svg.appendChild(el("rect", {x: ML, y: Y(b.hi), width: PW, height: Y(b.lo) - Y(b.hi), fill: b.color}));
@@ -143,6 +197,7 @@ function draw(maxDays) {
     t.textContent = v;
     svg.appendChild(t);
   });
+  }
   // x ticks: per-day numbers in the 1M view only (they would smear at
   // 3M/6M spacing); month labels in every daily view
   var HH = (maxDays === 31) ? H + 18 : H;
@@ -196,10 +251,10 @@ function draw(maxDays) {
     body.appendChild(tt);
     svg.appendChild(body);
     if (maxDays === 31 && k.tracked) {
-      var th = el("text", {x: cx, y: yH - 5, "text-anchor": "middle", "class": "rangelabel"});
+      var th = el("text", {x: cx, y: Math.max(MT + 9, yH - 5), "text-anchor": "middle", "class": "rangelabel"});
       th.textContent = k.h;
       svg.appendChild(th);
-      var tl = el("text", {x: cx, y: yL + 13, "text-anchor": "middle", "class": "rangelabel"});
+      var tl = el("text", {x: cx, y: Math.min(MT + PH - 1, yL + 13), "text-anchor": "middle", "class": "rangelabel"});
       tl.textContent = k.l;
       svg.appendChild(tl);
     }
@@ -216,8 +271,20 @@ function drawWeek() {
   while (svg.firstChild) svg.removeChild(svg.firstChild);
   var HH = H + 18;
   svg.setAttribute("viewBox", "0 0 " + W + " " + HH);
-  function Y(v) { return MT + (100 - v) / 100 * PH; }
-  // bands + y gridlines: same frame as the other views
+  // auto-scaled y axis fitted to the week's buckets, synthetic
+  // daily candles included; with nothing in range at all the
+  // frame stays on the fixed 0-100 scale
+  var dom = [0, 100];
+  if (WEEK30.length) {
+    var wvals = [];
+    WEEK30.forEach(function(k) { wvals.push(k.l, k.h); });
+    dom = yDomain(wvals);
+  }
+  function Y(v) { return MT + (dom[1] - v) / (dom[1] - dom[0]) * PH; }
+  if (WEEK30.length) {
+    drawFrame(Y, dom);
+  } else {
+  // bands + y gridlines: the fixed frame
   BANDS.forEach(function(b) {
     svg.appendChild(el("rect", {x: ML, y: Y(b.hi), width: PW, height: Y(b.lo) - Y(b.hi), fill: b.color}));
     var lab = el("text", {x: ML - 8, y: (Y(b.lo) + Y(b.hi)) / 2 + 4, "text-anchor": "end", "class": "bandlabel"});
@@ -231,6 +298,7 @@ function drawWeek() {
     t.textContent = v;
     svg.appendChild(t);
   });
+  }
   if (!WEEK30.length) {
     var note = el("text", {x: ML + PW / 2, y: MT + PH / 2, "text-anchor": "middle",
       "class": "axis", "font-size": "14"});
@@ -316,10 +384,10 @@ function drawWeek() {
     }
     // a synthetic candle's high/low are the day's real tracked
     // extremes, so it earns its labels like any sampled day
-    var th = el("text", {x: X(hi), y: Y(candles[hi].h) - 5, "text-anchor": "middle", "class": "rangelabel"});
+    var th = el("text", {x: X(hi), y: Math.max(MT + 9, Y(candles[hi].h) - 5), "text-anchor": "middle", "class": "rangelabel"});
     th.textContent = candles[hi].h;
     svg.appendChild(th);
-    var tl = el("text", {x: X(lo), y: Y(candles[lo].l) + 13, "text-anchor": "middle", "class": "rangelabel"});
+    var tl = el("text", {x: X(lo), y: Math.min(MT + PH - 1, Y(candles[lo].l) + 13), "text-anchor": "middle", "class": "rangelabel"});
     tl.textContent = candles[lo].l;
     svg.appendChild(tl);
   });
@@ -335,8 +403,17 @@ function drawDay() {
   while (svg.firstChild) svg.removeChild(svg.firstChild);
   var HH = H + 18;
   svg.setAttribute("viewBox", "0 0 " + W + " " + HH);
-  function Y(v) { return MT + (100 - v) / 100 * PH; }
-  // bands + y gridlines: same frame as the other views
+  // auto-scaled y axis fitted to the day's samples; the empty
+  // state keeps the fixed 0-100 frame and its collecting note
+  var dom = [0, 100];
+  if (DAY5.length) {
+    dom = yDomain(DAY5.map(function(p) { return p.v; }));
+  }
+  function Y(v) { return MT + (dom[1] - v) / (dom[1] - dom[0]) * PH; }
+  if (DAY5.length) {
+    drawFrame(Y, dom);
+  } else {
+  // bands + y gridlines: the fixed frame
   BANDS.forEach(function(b) {
     svg.appendChild(el("rect", {x: ML, y: Y(b.hi), width: PW, height: Y(b.lo) - Y(b.hi), fill: b.color}));
     var lab = el("text", {x: ML - 8, y: (Y(b.lo) + Y(b.hi)) / 2 + 4, "text-anchor": "end", "class": "bandlabel"});
@@ -350,6 +427,7 @@ function drawDay() {
     t.textContent = v;
     svg.appendChild(t);
   });
+  }
   // x axis: the full session frame 9:30-16:00 ET, hourly ticks
   var M0 = 9 * 60 + 30, M1 = 16 * 60;
   function X(m) { return ML + (m - M0) / (M1 - M0) * PW; }
@@ -387,10 +465,10 @@ function drawDay() {
     svg.appendChild(dot);
   });
   // the day's high and low samples labelled, as the 1M view labels extremes
-  var th = el("text", {x: X(DAY5[hi].m), y: Y(DAY5[hi].v) - 6, "text-anchor": "middle", "class": "rangelabel"});
+  var th = el("text", {x: X(DAY5[hi].m), y: Math.max(MT + 9, Y(DAY5[hi].v) - 6), "text-anchor": "middle", "class": "rangelabel"});
   th.textContent = DAY5[hi].v;
   svg.appendChild(th);
-  var tl = el("text", {x: X(DAY5[lo].m), y: Y(DAY5[lo].v) + 14, "text-anchor": "middle", "class": "rangelabel"});
+  var tl = el("text", {x: X(DAY5[lo].m), y: Math.min(MT + PH - 1, Y(DAY5[lo].v) + 14), "text-anchor": "middle", "class": "rangelabel"});
   tl.textContent = DAY5[lo].v;
   svg.appendChild(tl);
   // latest sample marker + its value labelled on the right axis
