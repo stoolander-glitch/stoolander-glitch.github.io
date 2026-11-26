@@ -86,7 +86,7 @@ function fmtTick(ms) {
   return mon + " \u2019" + String(d.getUTCFullYear()).slice(2);
 }
 function weekStart(ms) { return ms - ((new Date(ms).getUTCDay() + 6) % 7) * 86400000; }
-// Auto-scaled y axis for the 1M, 1W and 1D views: the domain is the
+// Auto-scaled y axis for the 1W and 1D views: the domain is the
 // data range padded by max(3, 15% of the range), widened to a
 // 10-point minimum span, clamped to [0, 100]
 function yDomain(vals) {
@@ -169,15 +169,11 @@ function draw(maxDays) {
   var slot = PW / n;
   var bw = Math.max(3, Math.min(22, slot * 0.55));
   function X(i) { return ML + slot * (i + 0.5); }
-  // the 1M view auto-scales its y axis to the month in view; the
-  // longer views keep the fixed 0-100 scale
-  var scaled = (maxDays === 31);
+  // every view drawn here keeps the fixed 0-100 scale (the 1M
+  // view was briefly auto-scaled on 2026-11-26 and reverted at
+  // Stoo's call; auto-scaling lives in the 1W and 1D views)
+  var scaled = false;
   var dom = [0, 100];
-  if (scaled) {
-    var dvals = [];
-    candles.forEach(function(k) { dvals.push(k.l, k.h); });
-    dom = yDomain(dvals);
-  }
   function Y(v) { return MT + (dom[1] - v) / (dom[1] - dom[0]) * PH; }
   if (scaled) {
     drawFrame(Y, dom);
