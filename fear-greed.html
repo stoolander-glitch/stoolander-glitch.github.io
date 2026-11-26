@@ -42,10 +42,13 @@ samples recorded yet shows its daily candle &mdash; the same candle the
 1M view plots for that day &mdash; in the 3:30pm slot. The <b>1D</b> view
 plots the most recent session&rsquo;s <b>5-minute samples as a line</b> &mdash;
 a tick chart, one dot per sample across the 9:30&ndash;16:00 ET session, no
-candles. In the <b>1M, 1W and 1D</b> views an <b>amber S&amp;P 500</b>
+candles. In the <b>1M, 1W and 1D</b> views an <b>S&amp;P 500</b>
 overlay sits on its own right-hand axis &mdash; daily OHLC bars in
 the 1M, a line of 30-minute closes in the 1W, a line of 5-minute
-closes in the 1D &mdash; toggled by the <b>SPX</b> button.
+closes in the 1D &mdash; toggled by the <b>SPX</b> button. The 1M
+bars are coloured like the candles &mdash; teal when SPX closed up on
+the day, red when it closed down, amber only when exactly flat; the
+1W and 1D lines stay amber.
 History from 2025-10-30.</p>
 <p class="latest">Latest day (2026-11-25): open 11 &middot; high 16 &middot; low 9 &middot; close 15</p>
 <div class="ranges" id="ranges">
@@ -62,9 +65,11 @@ In the 1W view, each day&rsquo;s high and low are labelled instead of each
 bar&rsquo;s. Days are spaced evenly &mdash; weekends and holidays take no space.
 In the 1D view, the line joins the session&rsquo;s 5-minute samples and the
 day&rsquo;s high and low samples are labelled; hover any dot for its time and
-value. The amber overlay in the 1M, 1W and 1D views is the S&amp;P 500 (SPX)
+value. The overlay in the 1M, 1W and 1D views is the S&amp;P 500 (SPX)
 on its own right-hand axis &mdash; daily OHLC bars in the 1M (stem = the
-day&rsquo;s range, left tick = open, right tick = close), a line in the 1W
+day&rsquo;s range, left tick = open, right tick = close), coloured teal
+when SPX closed up on the day and red when it closed down (amber only
+when exactly flat), and an amber line in the 1W
 and 1D; hover it for values, and use the SPX button to show or hide it.</p>
 <script>
 "use strict";
@@ -152,7 +157,7 @@ function drawFrame(Y, dom) {
     svg.appendChild(t);
   });
 }
-// SPX overlay helpers: the amber overlay lives on its own
+// SPX overlay helpers: the overlay lives on its own
 // right-hand axis, auto-scaled to the SPX range in view
 function spxDomain(vals) {
   var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
@@ -347,17 +352,20 @@ function draw(maxDays) {
       var Y2M = function(v) { return MT + (sdomM[1] - v) / (sdomM[1] - sdomM[0]) * PH; };
       svg.setAttribute("viewBox", "0 0 " + (W + SPXW) + " " + HH);
       sptsM.forEach(function(p) {
+        // coloured like the F&G candles by the day's direction:
+        // teal up, red down, amber only when exactly flat
+        var bcol = p.c > p.o ? "#32A499" : (p.c < p.o ? "#AD5650" : SPXCOL);
         var stem = el("line", {x1: p.x, x2: p.x, y1: Y2M(p.h), y2: Y2M(p.l),
-          stroke: SPXCOL, "stroke-width": 1.5, "class": "spxbar"});
+          stroke: bcol, "stroke-width": 1.5, "class": "spxbar"});
         var tt = document.createElementNS(NS, "title");
         tt.textContent = p.label + "\nS&P 500: Open: " + p.o + " · High: " + p.h +
           " · Low: " + p.l + " · Close: " + p.c;
         stem.appendChild(tt);
         svg.appendChild(stem);
         svg.appendChild(el("line", {x1: p.x - bw / 2, x2: p.x, y1: Y2M(p.o), y2: Y2M(p.o),
-          stroke: SPXCOL, "stroke-width": 1.5, "class": "spxbar"}));
+          stroke: bcol, "stroke-width": 1.5, "class": "spxbar"}));
         svg.appendChild(el("line", {x1: p.x, x2: p.x + bw / 2, y1: Y2M(p.c), y2: Y2M(p.c),
-          stroke: SPXCOL, "stroke-width": 1.5, "class": "spxbar"}));
+          stroke: bcol, "stroke-width": 1.5, "class": "spxbar"}));
       });
       drawSpxAxis(Y2M, sdomM);
     }
